@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '47 */6 * * *'
   workflow_dispatch:
+    inputs:
+      test_notification:
+        description: Send a Media.io Bark test notification
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -31,7 +37,7 @@ jobs:
         env:
           BARK_DEVICE_KEY: ${{ secrets.BARK_DEVICE_KEY }}
           BARK_SERVER_URL: ${{ secrets.BARK_SERVER_URL }}
-        run: python media_io_sitemap_crawler.py --require-notification
+        run: python media_io_sitemap_crawler.py --require-notification ${{ inputs.test_notification && '--test-notification' || '' }}
 
       - name: Commit monitoring state and reports
         run: |

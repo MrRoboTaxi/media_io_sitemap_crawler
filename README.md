@@ -16,6 +16,8 @@ python3 -m unittest discover -s media_io_sitemap_crawler/tests
 
 `--bootstrap` is for the first run only; it records existing URLs without alerting.
 
+Use the workflow's **test_notification** input to verify the Bark delivery path without changing the sitemap baseline.
+
 ## Deployment
 
 `.github/workflows/monitor-media-io.yml` runs every six hours, offset from the Dreamina workflow. It uses the repository's existing `BARK_DEVICE_KEY` and optional `BARK_SERVER_URL` secrets. The Action commits its state and reports to the repository. No third-party Python packages are required.

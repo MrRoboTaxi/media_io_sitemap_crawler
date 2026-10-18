@@ -199,8 +199,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--bootstrap", action="store_true", help="Write baseline state without generating a notification.")
     parser.add_argument("--require-notification", action="store_true", help="Fail if the Bark key is missing when new URLs appear.")
+    parser.add_argument("--test-notification", action="store_true", help="Send a Bark test notification and exit.")
     arguments = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    if arguments.test_notification:
+        send_bark(["https://www.media.io/monitor-test"], require_notification=True)
+        return 0
     current_urls = collect_urls()
     known_urls = load_known_urls()
     if arguments.bootstrap or not known_urls:
