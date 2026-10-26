@@ -2,7 +2,7 @@
 
 Monitors new English pages in the public `https://www.media.io/sitemap.xml`. Media.io lists eleven translated sitemaps separately in `robots.txt`; those are excluded to avoid duplicate alerts for localized versions of the same page.
 
-The durable baseline is `state/known_urls.txt`. Each later run writes new URL details to `reports/<UTC timestamp>/` and sends one Bark notification grouped as `media-io-sitemap`. A failed sitemap fetch or Bark push fails the run before the baseline is updated, so the next run can retry.
+The durable baseline is `state/known_urls.txt`. Each later run writes new URL details to `reports/<UTC timestamp>/` and sends Bark notifications grouped as `media-io-sitemap`, with at most 12 URLs per message. A failed sitemap fetch or Bark push fails the run before the baseline is updated, so the next run can retry.
 
 ## Local use
 

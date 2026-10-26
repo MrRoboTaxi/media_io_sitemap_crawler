@@ -176,23 +176,23 @@ def send_bark(new_urls: list[str], require_notification: bool = False) -> None:
         logging.warning("BARK_DEVICE_KEY is unset; skipping notification")
         return
     base_url = (os.environ.get("BARK_SERVER_URL") or "https://api.day.app").rstrip("/")
-    preview = "\n".join(url.rsplit("/", 1)[-1] for url in new_urls[:12])
-    suffix = f"\n…及另外 {len(new_urls) - 12} 条" if len(new_urls) > 12 else ""
-    payload = json.dumps(
-        {
-            "title": f"Media.io 新增 {len(new_urls)} 个英文页面",
-            "body": preview + suffix,
-            "group": "media-io-sitemap",
-            "sound": "minuet",
-        },
-        ensure_ascii=False,
-    ).encode("utf-8")
     endpoint = f"{base_url}/{urllib.parse.quote(key, safe='')}"
-    request = urllib.request.Request(endpoint, data=payload, headers={"Content-Type": "application/json", "User-Agent": USER_AGENT}, method="POST")
-    with urllib.request.urlopen(request, timeout=20) as response:
-        if not 200 <= response.status < 300:
-            raise RuntimeError(f"Bark returned HTTP {response.status}")
-    logging.info("Bark notification sent")
+    total_parts = (len(new_urls) + 11) // 12
+    for part, start in enumerate(range(0, len(new_urls), 12), 1):
+        chunk = new_urls[start:start + 12]
+        title = f"Media.io 新增 {len(new_urls)} 个英文页面"
+        if total_parts > 1:
+            title += f"（{part}/{total_parts}）"
+        payload = json.dumps(
+            {"title": title, "body": "\n".join(url.rsplit("/", 1)[-1] for url in chunk),
+             "group": "media-io-sitemap", "sound": "minuet"},
+            ensure_ascii=False,
+        ).encode("utf-8")
+        request = urllib.request.Request(endpoint, data=payload, headers={"Content-Type": "application/json", "User-Agent": USER_AGENT}, method="POST")
+        with urllib.request.urlopen(request, timeout=20) as response:
+            if not 200 <= response.status < 300:
+                raise RuntimeError(f"Bark returned HTTP {response.status}")
+        logging.info("Bark notification sent for Media.io (%d/%d, %d URLs)", part, total_parts, len(chunk))
 
 
 def main() -> int:
